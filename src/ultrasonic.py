@@ -86,9 +86,9 @@ class ultrasonic():
     def pub(self,dist):
         msg = Ultrasonic()
         msg.front_us = dist[0]
-        msg.front_us = dist[1]
-        msg.front_us = dist[2]
-        msg.front_us = dist[3]
+        msg.back_us = dist[1]
+        msg.left_us = dist[2]
+        msg.right_us = dist[3]
         
         self.pub_us.publish(msg)
 
