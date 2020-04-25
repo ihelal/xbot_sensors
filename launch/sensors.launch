@@ -1,0 +1,3 @@
+<launch>
+	<node name="xbot_sensors" pkg="xbot_sensors" type="ultrasonic.py" output="screen" />
+</launch>
