@@ -21,8 +21,7 @@ class ultrasonic():
         self.init_us()
 
         rospy.init_node('ultrasonic_sensors', anonymous=False)
-        # pub = rospy.Publisher('topic_name', String, queue_size=10)
-        # rospy.Publisher("/cmd_vel", Twist, self.cb_Twist)
+        self.pub_us = rospy.Publisher('/sensor_ultrasonic', Ultrasonic, queue_size=10)
         
     def init_us(self):
         GPIO.setmode(GPIO.BCM)
@@ -85,8 +84,13 @@ class ultrasonic():
         GPIO.cleanup()
     
     def pub(self,dist):
+        msg = Ultrasonic()
+        msg.front_us = dist[0]
+        msg.front_us = dist[1]
+        msg.front_us = dist[2]
+        msg.front_us = dist[3]
         
-        pub.publish("hello world")
+        self.pub_us.publish(msg)
 
 if __name__ == '__main__':
     run = ultrasonic()
