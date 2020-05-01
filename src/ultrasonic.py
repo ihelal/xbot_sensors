@@ -5,7 +5,7 @@ import time
 
 from xbot_sensors.msg import Ultrasonic
 
-class ultrasonic():
+class Ultrasonic():
     def __init__(self):
         self.GPIO_TRIGGER = 12
         self.GPIO_ECHO_F = 8
@@ -93,6 +93,6 @@ class ultrasonic():
         self.pub_us.publish(msg)
 
 if __name__ == '__main__':
-    run = ultrasonic()
+    run = Ultrasonic()
     run.spin()
     
