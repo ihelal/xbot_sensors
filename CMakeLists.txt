@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
 )
+catkin_python_setup()
+
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -47,6 +49,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(FILES
   Ultrasonic.msg
+  LineFollower.msg
 )
 
 ## Generate services in the 'srv' folder
