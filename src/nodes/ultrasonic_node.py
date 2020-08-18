@@ -6,7 +6,7 @@ from xbot_sensors.ultrasonic import Ultrasonic_Sensors
 class Ultrasonic_Node():
     def __init__(self):
         self.us_sensor = Ultrasonic_Sensors()
-        self.NODE_RATE = 10 #Hz
+        self.NODE_RATE = 30 #Hz
         rospy.init_node('ultrasonic', anonymous=False)
         self.pub_us = rospy.Publisher('/sensors/ultrasonic', Ultrasonic, queue_size=10)
  
