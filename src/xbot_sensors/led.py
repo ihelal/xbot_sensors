@@ -3,7 +3,7 @@ import rospy
 from neopixel import *
 import time
 
-class led():
+class LED():
     def __init__(self):
         # LED strip configuration:
         self.LED_COUNT      = 24      # Number of LED pixels.
@@ -54,6 +54,6 @@ class led():
 
 
 if __name__ == '__main__':
-    run = led()
+    run = LED()
     run.spin()
     
