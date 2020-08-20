@@ -1,29 +1,23 @@
-#!/usr/bin/python
-import RPi.GPIO as GPIO
+#!/usr/bin/python3
 import time
-from mybot_sdk.robot_setup import get_robot_cfg
+from mybot_sdk.robot_setup import Brain
 
 class IR():
     def __init__(self):
-        LineFollower = get_robot_cfg()["Sensors"]["LineFollower"]
-        self.LINE_LEFT = LineFollower["L"]
-        self.LINE_CENTER = LineFollower["C"]
-        self.LINE_RIGHT = LineFollower["R"]
-        self.init_ir()
-
-    def init_ir(self):
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.LINE_LEFT, GPIO.IN)
-        GPIO.setup(self.LINE_CENTER, GPIO.IN)
-        GPIO.setup(self.LINE_RIGHT, GPIO.IN)
+        self.brain = Brain()
+        self.LineFollower = self.brain.initIR()
+        self.L = self.LineFollower[0]
+        self.C = self.LineFollower[1]
+        self.R = self.LineFollower[2]
 
     def read_line(self):
-        L_VAL = (GPIO.input(self.LINE_LEFT) == True)
-        C_VAL = (GPIO.input(self.LINE_CENTER) == True)
-        R_VAL = (GPIO.input(self.LINE_RIGHT) == True) 
+        L_VAL = (self.brain.get_input_status(self.L) == True)
+        C_VAL = (self.brain.get_input_status(self.C) == True)
+        R_VAL = (self.brain.get_input_status(self.R) == True) 
         return L_VAL,C_VAL,R_VAL
 
 # if __name__ == '__main__':
 #     run = IR()
-#     while 1:
+#     while True:
 #        print(run.read_line())
+#        time.sleep(0.03333)

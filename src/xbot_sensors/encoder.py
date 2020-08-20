@@ -2,10 +2,9 @@
 import rospy
 import RPi.GPIO as GPIO
 import time
-
 from std_msgs.msg import Int64
 
-class Switch():
+class Encoders():
     def __init__(self):
         self.LF_ENCODER_PIN = 14
         self.RF_ENCODER_PIN = 15
@@ -64,8 +63,11 @@ class Switch():
         msg = Int64()
         msg.data = value
         self.pub_switch.publish(msg)
+        
+    def getEncoderValue(self,pin):
+        pass
 
 if __name__ == '__main__':
-    run = Switch()
+    run = Encoders()
     run.spin()
     
