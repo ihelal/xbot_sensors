@@ -42,6 +42,11 @@ class MPU6050:
 		self.setUp()
 		self.calibrateGyro(CALIBRATION_POINTS)
 
+		self.prev_r = 0
+		self.prev_p = 0
+		self.prev_y = 0
+		
+
 	def gyroSensitivity(self, x):
 		# Create dictionary with standard value of 500 deg/s
 		return {
@@ -93,7 +98,7 @@ class MPU6050:
 		self.gy = self.eightBit2sixteenBit(self.MPU6050["GYRO_YOUT_H"])
 		self.gz = self.eightBit2sixteenBit(self.MPU6050["GYRO_ZOUT_H"])
 
-		self.ax = self.eightBit2sixteenBit(self.MPU6050["INT_ENABLE"])
+		self.ax = self.eightBit2sixteenBit(self.MPU6050["ACCEL_XOUT_H"])
 		self.ay = self.eightBit2sixteenBit(self.MPU6050["ACCEL_YOUT_H"])
 		self.az = self.eightBit2sixteenBit(self.MPU6050["ACCEL_ZOUT_H"])
 
@@ -149,7 +154,35 @@ class MPU6050:
 		az = self.az 
 
 		return gx,gy,gz,ax,ay,az
+		# return ax,ay,az
+	
+	def get_AngularVelocity(self):
+		# gx,gy,gz,ax,ay,az = self.processIMUvalues()
+		curr_r,curr_p,curr_y,dt = self.compFilter()
 
+		r_dtheta = curr_r - self.prev_r
+		p_dtheta = curr_p - self.prev_p
+		y_dtheta = curr_y - self.prev_y
+
+
+		r_velocity = (math.pi/180)*(r_dtheta /dt) #Rad/s
+		p_velocity = (math.pi/180)*(p_dtheta /dt) #Rad/s
+		y_velocity = (math.pi/180)*(y_dtheta /dt) #Rad/s
+
+		self.prev_r = curr_r
+		self.prev_p = curr_p
+		self.prev_y = curr_y
+
+		return r_velocity,p_velocity,y_velocity
+	
+	def get_LinearVelocity(self):
+		gx,gy,gz,ax,ay,az = self.processIMUvalues()
+		# Get delta time and record time for next call
+		dt = time.time() - self.dtTimer
+		self.dtTimer = time.time()
+
+		
+		
 	def compFilter(self):
 		# Get the processed values from IMU
 		gx,gy,gz,ax,ay,az = self.processIMUvalues()
@@ -176,8 +209,16 @@ class MPU6050:
 		# print(" R: " + str(round(self.roll,1)) \
 		#     + " P: " + str(round(self.pitch,1)) \
 		#     + " Y: " + str(round(self.yaw,1)))
-		
-		return self.roll,self.pitch,self.yaw
+		return self.roll,self.pitch,self.yaw,dt
+		# return round(self.roll,self.ACCURACY),round(self.pitch,self.ACCURACY),round(self.yaw,self.ACCURACY),dt
+	
+	def get_rpy(self):
+		r,p,y = self.compFilter()
+		r = round(r,self.ACCURACY)
+		p = round(p,self.ACCURACY)
+		y = round(y,self.ACCURACY)
+		return r, p, y
+
 
 	def get_roll(self):
 		roll = self.compFilter()[0]
@@ -215,12 +256,7 @@ class MPU6050:
 		az = self.processIMUvalues()[5]
 		return round(az,self.RAW_ACCURACY)
 
-# def main():
-#     mpu = MPU6050()
-#     while(1):
-# 		print("Gx: "+str(mpu.get_gx()), str(mpu.get_gz()))
-# 		time.sleep(0.033333333)
-
-# # Main loop
-# if __name__ == '__main__':
-# 	main()
+imu = MPU6050()
+if __name__ == '__main__':
+	while True:
+		print(imu.get_AngularVelocity())

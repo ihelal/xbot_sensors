@@ -15,6 +15,16 @@ class IR():
         C_VAL = (self.brain.get_input_status(self.C) == True)
         R_VAL = (self.brain.get_input_status(self.R) == True) 
         return L_VAL,C_VAL,R_VAL
+    
+    def get_ir_side(self,side):
+        reading = self.read_line()
+        if side == "LEFT":
+            return reading[0]
+        elif side == "CENTER":
+            return reading[1]
+        elif side == "RIGHT":
+            return reading[2]
+
 
 # if __name__ == '__main__':
 #     run = IR()
