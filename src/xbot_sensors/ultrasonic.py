@@ -16,11 +16,6 @@ class Ultrasonic_Sensors:
         self.GPIO_ECHO_L = Ultrasonic['Left']
         self.MAX_RANGE = Ultrasonic['MaxRange']
 
-        self.f_us = 0
-        self.b_us = 0
-        self.r_us = 0
-        self.l_us = 0
-
         self.ACCURACY = 2
         self.TEMP = 25
         self.SAMPLES = 3
@@ -28,13 +23,6 @@ class Ultrasonic_Sensors:
         self.SYSTEM = "metric"
 
         self.us1,self.us2,self.us3,self.us4 = self.init_us()
-
-        self.req_side = side
-        self.FRONT = 'FRONT'
-        self.BACK = 'BACK'
-        self.RIGHT = 'RIGHT'
-        self.LEFT = 'LEFT'
-        self.ALL = 'ALL'
 
     def init_us(self):
         us1 = Measurement(self.GPIO_TRIGGER, self.GPIO_ECHO_F, self.TEMP, self.SYSTEM, self.GPIO_MODE)
