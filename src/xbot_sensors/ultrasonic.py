@@ -3,7 +3,7 @@ import RPi.GPIO as GPIO
 from mybot_sdk.robot_setup import get_robot_cfg
 from xbot_sensors.hcsr04 import Measurement
 
-class Ultrasonic_Sensors:
+class UltrasnoicSensor():
 
     def __init__(self, side='ALL'):
         self.GPIO_MODE = GPIO.BCM
@@ -14,12 +14,12 @@ class Ultrasonic_Sensors:
         self.GPIO_ECHO_B = Ultrasonic['Back']
         self.GPIO_ECHO_R = Ultrasonic['Right']
         self.GPIO_ECHO_L = Ultrasonic['Left']
-        self.MAX_RANGE = Ultrasonic['MaxRange']
+        self.MAX_RANGE = Ultrasonic['Range']['Max']
 
         self.ACCURACY = 2
         self.TEMP = 25
-        self.SAMPLES = 3
-        self.RATE = 0.01
+        self.SAMPLES = 2
+        self.RATE = 0.04
         self.SYSTEM = "metric"
 
         self.us1,self.us2,self.us3,self.us4 = self.init_us()
