@@ -18,7 +18,7 @@ class Ultrasonic_Sensors():
         self.r_us = 0
         self.l_us = 0
 
-        self.ACCURACY = 2 #Deciaml Places
+        self.ACCURACY = 1 #Deciaml Places
         self.init_us()
 
         self.req_side = side
@@ -62,17 +62,19 @@ class Ultrasonic_Sensors():
         # and divide by 2, because there and back
         distance = TimeElapsed * 17150
 
-        if(distance > self.MAX_RANGE):
+        if(distance > self.MAX_RANGE or distance < 0):
             return self.MAX_RANGE 
         else:
             return distance
-        
+        return distance
     
     def measure_dist(self):  
-        # self.f_us = self.distance(self.GPIO_ECHO_F)
-        # self.b_us = self.distance(self.GPIO_ECHO_B)
-        # self.l_us = self.distance(self.GPIO_ECHO_L)
+        self.f_us = self.distance(self.GPIO_ECHO_F)
+        self.b_us = self.distance(self.GPIO_ECHO_B)
+        self.l_us = self.distance(self.GPIO_ECHO_L)
         self.r_us = self.distance(self.GPIO_ECHO_R)  
+
+        # return self.f_us,self.l_us,self.b_us,self.r_us
 
     def read_us(self):
         self.measure_dist()
@@ -81,19 +83,22 @@ class Ultrasonic_Sensors():
         right_us = round(self.r_us,self.ACCURACY)
         left_us  = round(self.l_us,self.ACCURACY)
 
-        if(self.req_side == self.FRONT):
-            return front_us
-        elif(self.req_side == self.BACK):
-            return back_us
-        elif(self.req_side == self.RIGHT):
-            return right_us 
-        elif(self.req_side == self.LEFT):
-            return left_us 
-        elif(self.req_side == self.ALL):
-            return front_us,back_us,left_us,right_us
+        # if(self.req_side == self.FRONT):
+        #     return front_us
+        # elif(self.req_side == self.BACK):
+        #     return back_us
+        # elif(self.req_side == self.RIGHT):
+        #     return right_us 
+        # elif(self.req_side == self.LEFT):
+        #     return left_us 
+        # elif(self.req_side == self.ALL):
+        #     return front_us,back_us,left_us,right_us
+        time.sleep(0.1)
+        return front_us,left_us,back_us,right_us
 
-# if __name__ == '__main__':
-#     run = Ultrasonic_Sensors()
-#     while 1:
-#         print(run.read_us())
+if __name__ == '__main__':
+    run = Ultrasonic_Sensors()
+    while 1:
+        print(run.read_us())
+        # time.sleep(0.1)
     
