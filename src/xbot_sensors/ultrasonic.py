@@ -1,7 +1,13 @@
+#!/usr/bin/python3
+import RPi.GPIO as GPIO
+from mybot_sdk.robot_setup import get_robot_cfg
+from xbot_sensors.hcsr04 import Measurement
 
 class Ultrasonic_Sensors:
 
     def __init__(self, side='ALL'):
+        self.GPIO_MODE = GPIO.BCM
+
         Ultrasonic = get_robot_cfg()['Sensors']['Ultrasonic']
         self.GPIO_TRIGGER = Ultrasonic['Trigger']
         self.GPIO_ECHO_F = Ultrasonic['Front']
@@ -9,12 +15,20 @@ class Ultrasonic_Sensors:
         self.GPIO_ECHO_R = Ultrasonic['Right']
         self.GPIO_ECHO_L = Ultrasonic['Left']
         self.MAX_RANGE = Ultrasonic['MaxRange']
+
         self.f_us = 0
         self.b_us = 0
         self.r_us = 0
         self.l_us = 0
+
         self.ACCURACY = 2
-        self.init_us()
+        self.TEMP = 25
+        self.SAMPLES = 3
+        self.RATE = 0.01
+        self.SYSTEM = "metric"
+
+        self.us1,self.us2,self.us3,self.us4 = self.init_us()
+
         self.req_side = side
         self.FRONT = 'FRONT'
         self.BACK = 'BACK'
@@ -23,49 +37,50 @@ class Ultrasonic_Sensors:
         self.ALL = 'ALL'
 
     def init_us(self):
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setwarnings(False)
-        GPIO.setup(self.GPIO_TRIGGER, GPIO.OUT)
-        GPIO.setup(self.GPIO_ECHO_F, GPIO.IN)
-        GPIO.setup(self.GPIO_ECHO_B, GPIO.IN)
-        GPIO.setup(self.GPIO_ECHO_R, GPIO.IN)
-        GPIO.setup(self.GPIO_ECHO_L, GPIO.IN)
+        us1 = Measurement(self.GPIO_TRIGGER, self.GPIO_ECHO_F, self.TEMP, self.SYSTEM, self.GPIO_MODE)
+        us2 = Measurement(self.GPIO_TRIGGER, self.GPIO_ECHO_L, self.TEMP, self.SYSTEM, self.GPIO_MODE)
+        us3 = Measurement(self.GPIO_TRIGGER, self.GPIO_ECHO_B, self.TEMP, self.SYSTEM, self.GPIO_MODE)
+        us4 = Measurement(self.GPIO_TRIGGER, self.GPIO_ECHO_R, self.TEMP, self.SYSTEM, self.GPIO_MODE)
 
-    def distance(self, side):
-        GPIO.output(self.GPIO_TRIGGER, True)
-        time.sleep(1e-05)
-        GPIO.output(self.GPIO_TRIGGER, False)
-        StartTime = time.time()
-        StopTime = time.time()
-        while GPIO.input(side) == 0:
-            StartTime = time.time()
+        return us1,us2,us3,us4
 
-        while GPIO.input(side) == 1:
-            StopTime = time.time()
+    def cm_to_m(self,cm):
+        m = cm/100.00
+        return m
 
-        TimeElapsed = StopTime - StartTime
-        distance = TimeElapsed * 17150
-        if distance > self.MAX_RANGE:
-            return self.MAX_RANGE
+    def get_readings_cm(self):
+        f = self.us1.raw_distance(self.SAMPLES,self.RATE)
+        l = self.us2.raw_distance(self.SAMPLES,self.RATE)
+        b = self.us3.raw_distance(self.SAMPLES,self.RATE)
+        r = self.us4.raw_distance(self.SAMPLES,self.RATE)
+
+        return f,l,b,r
+    
+    def get_readings_m(self):
+        f,l,b,r = self.get_readings_cm()
+
+        f = round(f,self.ACCURACY)
+        l = round(l,self.ACCURACY)
+        b = round(b,self.ACCURACY)
+        r = round(r,self.ACCURACY)
+
+        return f,l,b,r
+    
+    def get_us_side_cm(self,side):
+        if side == 0:
+            return self.get_readings_cm()[0]
+        if side == 1:
+            return self.get_readings_cm()[1]
+        if side == 2:
+            return self.get_readings_cm()[2]
+        if side == 3:
+            return self.get_readings_cm()[3]
         else:
-            return distance
+            raise SystemError("Invalid Requested Ultrasonic")
+    
+    def get_us_side_m(self,side):
+        val = self.get_us_side_cm(side)
+        val = self.cm_to_m(val)
+        val = round(val,self.ACCURACY)
 
-    def measure_dist(self):
-        self.r_us = self.distance(self.GPIO_ECHO_R)
-
-    def read_us(self):
-        self.measure_dist()
-        front_us = round(self.f_us, self.ACCURACY)
-        back_us = round(self.b_us, self.ACCURACY)
-        right_us = round(self.r_us, self.ACCURACY)
-        left_us = round(self.l_us, self.ACCURACY)
-        if self.req_side == self.FRONT:
-            return front_us
-        if self.req_side == self.BACK:
-            return back_us
-        if self.req_side == self.RIGHT:
-            return right_us
-        if self.req_side == self.LEFT:
-            return left_us
-        if self.req_side == self.ALL:
-            return (front_us, back_us, left_us, right_us)
+        return val
