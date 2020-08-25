@@ -70,15 +70,21 @@ class Measurement(object):
             time.sleep(0.00001)
             GPIO.output(self.trig_pin, False)
             echo_status_counter = 1
-            while GPIO.input(self.echo_pin) == 0:
-                if echo_status_counter < 1000:
-                    sonar_signal_off = time.time()
-                    echo_status_counter += 1
-                else:
-                    raise SystemError("Echo pulse was not received")
-            while GPIO.input(self.echo_pin) == 1:
-                sonar_signal_on = time.time()
-            time_passed = sonar_signal_on - sonar_signal_off
+            if GPIO.input(self.echo_pin) == 0:
+                print("OFF")
+                while GPIO.input(self.echo_pin) == 0:
+                    if echo_status_counter < 1000:
+                        self.sonar_signal_off = time.time()
+                        echo_status_counter += 1
+                    else:
+                        raise SystemError("Echo pulse was not received")
+            elif GPIO.input(self.echo_pin) == 1:
+                print("ON")
+                while GPIO.input(self.echo_pin) == 1:
+                    self.sonar_signal_on = time.time()
+            else:
+                raise SystemError("Broken Sensor")
+            time_passed = self.sonar_signal_on - self.sonar_signal_off
             distance_cm = time_passed * ((speed_of_sound * 100) / 2)
             sample.append(distance_cm)
         sorted_sample = sorted(sample)
@@ -215,3 +221,4 @@ class Measurement(object):
         """This method is deprecated, use distance method instead."""
         warnings.warn("use distance method instead", DeprecationWarning)
         return median_reading * 0.394
+

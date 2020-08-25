@@ -3,6 +3,8 @@ import RPi.GPIO as GPIO
 from mybot_sdk.robot_setup import get_robot_cfg
 from xbot_sensors.hcsr04 import Measurement
 
+import time
+
 class UltrasnoicSensor():
 
     def __init__(self, side='ALL'):
@@ -18,11 +20,15 @@ class UltrasnoicSensor():
 
         self.ACCURACY = 2
         self.TEMP = 25
-        self.SAMPLES = 2
-        self.RATE = 0.04
+        self.SAMPLES = 1
+        self.RATE = 0.02
         self.SYSTEM = "metric"
-
+        
+        print("Initializing Ultrasonic...")
         self.us1,self.us2,self.us3,self.us4 = self.init_us()
+        
+        # time.sleep(1)
+
 
     def init_us(self):
         us1 = Measurement(self.GPIO_TRIGGER, self.GPIO_ECHO_F, self.TEMP, self.SYSTEM, self.GPIO_MODE)
@@ -72,3 +78,4 @@ class UltrasnoicSensor():
         val = round(val,self.ACCURACY)
 
         return val
+
